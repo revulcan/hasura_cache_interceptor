@@ -21,6 +21,8 @@ class CacheInterceptor implements Interceptor {
       "Connection Rejected",
       "Websocket Error",
     ].contains(error.message);
+    print(
+        "cache_interceptor : ${error.toString()} - ${error.message.toString()}");
 
     final containsCache = await _storage.containsKey(error.request.url);
     if (isConnectionError && containsCache) {
