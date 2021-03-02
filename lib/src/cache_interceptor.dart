@@ -21,12 +21,11 @@ class CacheInterceptor implements Interceptor {
       "Connection Rejected",
       "Websocket Error",
     ].contains(error.message);
-    print(
-        "cache_interceptor : ${error.toString()} - ${error.message.toString()}");
+    final key = Uuid().v5(error.request.url, error.request.query.toString());
 
-    final containsCache = await _storage.containsKey(error.request.url);
+    final containsCache = await _storage.containsKey(key);
     if (isConnectionError && containsCache) {
-      final cachedData = await _storage.get(error.request.url);
+      final cachedData = await _storage.get(key);
       return Response(data: cachedData);
     }
     return error;
@@ -39,7 +38,8 @@ class CacheInterceptor implements Interceptor {
 
   @override
   Future onResponse(Response data) async {
-    _storage.put(data.request.url, data.data);
+    final key = Uuid().v5(data.request.url, data.request.query.toString());
+    _storage.put(key, data.data);
     return data;
   }
 
